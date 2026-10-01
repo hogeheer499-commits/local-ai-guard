@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software or its evaluation results, please cite it as below."
+title: "local-ai-guard: evaluation of defenses for a local retrieval assistant"
+version: 0.2.0
+date-released: "2026-10-01"
+license: MIT
+repository-code: "https://github.com/hogeheer499-commits/local-ai-guard"
+authors:
+  - family-names: "van Dijk"
+    given-names: "Jesse"
+    affiliation: "Kleine Koe (JVD Netwerk)"
+    email: "jesse@kleinekoe.nl"
