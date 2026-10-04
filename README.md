@@ -2,7 +2,7 @@
 
 A small local question-answering assistant that answers only from an approved set of documents, plus an evaluation of how well its defenses hold up against poisoned documents.
 
-**Status (October 2026):** the main runs of the evaluation (version 0.2.0, "v5") are complete; the last external-tool runs and the final checks are in progress. The harness, aggregate results and a short technical report will be published in this repository; the release is planned for this autumn. Until then this repository holds the threat model, the policies and the method description. No results are published yet.
+**Status (October 2026):** [Preliminary aggregate results, method and limits](EVIDENCE-SUMMARY.md) are now public, with [machine-readable tables](RESULTS-PRELIMINARY.csv), a [table-generation script](make-evidence-table.py) and [publication hashes](EVIDENCE-SHA256.txt). The results concern evaluation v5, using the original measured defense code (package version 0.1.0). Counts were checked with LLM assistance, not yet independently scored by humans or replicated outside this setup. Defense modules are available privately to grant reviewers on request; the documented code, full harness and technical report follow in the research release.
 
 ## What it is
 
@@ -21,11 +21,11 @@ The first round of this evaluation (v4) was adversarially reviewed; the review s
 
 ## What will be published, and what will not
 
-See `DISCLOSURE-POLICY.md`. In short: attack categories, counts, hashes, the harness and the scoring are public; attack texts are available to researchers on request after fixes; canary strings, keys and raw model answers are never published.
+See `DISCLOSURE-POLICY.md`. In short: preliminary aggregate counts and method are public now; attack categories, item hashes, the harness and scoring are planned for the research release; attack texts are available to researchers on request after fixes; canary strings, keys and raw model answers are never published.
 
 ## Reproducibility
 
-The release includes one command to rerun the evaluation, hash-locked dependency files for the external tools, an environment record (model digests, runtime versions, corpus commit) and a repeat run that reports how many outcomes are identical. An external rerun by a person outside this setup is planned; its results will be published next to the original ones.
+The planned release includes one command to rerun the evaluation, hash-locked dependency files for the external tools, an environment record (model digests, runtime versions, corpus commit) and a repeat check with its selected attack type and outcome agreement reported explicitly; it is not a representative random sample across attack types. An external rerun by a person outside this setup is planned; its results will be published next to the original ones.
 
 ## Licenses
 
