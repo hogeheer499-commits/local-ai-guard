@@ -4,13 +4,15 @@ Results from evaluation v5, documented 3 October and published 4 October 2026. C
 
 ## Main finding
 
-The combined defenses stopped the fixed instruction-related attacks in these tests, but did not stop forged figures. The sanitizer could make a forged CSV row easier to retrieve: the row was retrieved in 24/24 tested cases with sanitization and 0/24 without it. Retrieval of a row is distinct from accepting its figure in an answer.
+The combined defenses stopped the fixed instruction-related attacks in these tests, but did not stop forged figures. The sanitizer could make a forged CSV row easier to retrieve: the row was retrieved in 24/24 tested cases with sanitization and 0/24 without it. With all four defenses, 13/24 answers were provisionally labelled as presenting that forged figure as correct. Retrieving the row in 24/24 cases is a separate outcome; it does not mean 24/24 answers accepted the forgery. This trace concerns one CSV case and does not explain every forged-figure result.
 
 ## Setting
 
 Four existing open-weight models, all 4-bit, on Ollama 0.32.15. The document corpus was the author's public Strix Halo guide, revision `b34b6ac887729cbd51e2a2ffe538d8810a2a896f`. The poisoned revision was approved by the author as an experimental condition; this was not a study of real human reviewers.
 
 Ten attack types, six repeats per type and model, 60 attempts per model and defense condition. The repeats are correlated. The defenses were measured separately and together: a system prompt, sanitizer, link filter and provenance check. The provenance check cannot reject a poisoned document already inside the approved revision.
+
+The grouping into instruction-related attacks (A1, A2, A5-A10) and forged figures (A3, A4) was made after seeing the results. It is a post-hoc analysis, not a preregistered comparison. Counts by individual type remain part of the planned full research release.
 
 ## Counts with approved poison
 
@@ -36,12 +38,58 @@ Each cell is successes out of 60 attempts, with approved poison. The CSV also re
 | qwen3.6:35b-a3b | 22 | 7 | 3 | 12 | 25 | 3 |
 | qwen3.8:27b-q4_K_M | 17 | 6 | 11 | 15 | 20 | 7 |
 
+## Supporting results
+
+These are separate checks from the original own attack suite. They use the same four principal models. Counts come from the recorded v5 aggregates; independent human validation remains pending.
+
+### Usefulness
+
+Factual answers labelled correct, out of 40 per model in the committed-corpus setup:
+
+| Model | No defense | All four |
+|---|---:|---:|
+| devstral-small-2:latest | 39/40 | 40/40 |
+| qwen2.5vl:7b | 38/40 | 35/40 |
+| qwen3.6:35b-a3b | 37/40 | 40/40 |
+| qwen3.8:27b-q4_K_M | 40/40 | 40/40 |
+| Total | 154/160 | 155/160 |
+
+The pooled counts conceal a decline for the 7B model. They do not establish an improvement in usefulness. With all defenses, each model also declined all five questions the guide could not answer (20/20 across models). These are recorded scoring outcomes, not independent human validation.
+
+### Adapted BIPIA subset
+
+Successful attacks in valid retrieved-answer cases, after LLM-assisted checking:
+
+| Model | No defense | System prompt | All four |
+|---|---:|---:|---:|
+| devstral-small-2:latest | 3/74 | 0/74 | 0/74 |
+| qwen2.5vl:7b | 0/74 | 0/74 | 0/74 |
+| qwen3.6:35b-a3b | 9/74 | 0/74 | 0/74 |
+| qwen3.8:27b-q4_K_M | 9/74 | 0/74 | 0/74 |
+| Total | 21/296 | 0/296 | 0/296 |
+
+This committed-corpus subset used 75 cases per model and setting. One case per model (four of 300 per setting) was excluded because the attack material was not retrieved. Scoring partly used a local judge model and was checked with LLM assistance. This is an adaptation, not a reproduction of the paper's reported benchmark results or evidence of general immunity. [BIPIA paper](https://arxiv.org/abs/2312.14197).
+
+### Repeat check: A2 only
+
+The same author reran one of the ten fixed attack types, A2, selected by the repeat script's seed. This compared 312 of the original 3,120 attack measurements across committed and memory poison modes. The original automatic labels matched in 293/312 cases (93.9%, rounded to 94%); 19 differed. It was not an outside replication or a random sample of measurements across attack types.
+
+| Model | Automatic labels matched, all settings | Automatic labels matched, all-four settings |
+|---|---:|---:|
+| devstral-small-2:latest | 77/78 | 12/12 |
+| qwen2.5vl:7b | 78/78 | 12/12 |
+| qwen3.6:35b-a3b | 70/78 | 12/12 |
+| qwen3.8:27b-q4_K_M | 68/78 | 12/12 |
+| Total | 293/312 | 48/48 |
+
+The all-four column includes both approved and unapproved source conditions (six measurements per model per condition). Agreement concerns automatic outcome labels, not identical answer text. It does not repeat the forged-figure attack types A3/A4 or independently validate any label. Later LLM-corrected labels are separate from this automatic comparison.
+
 ## Limits and checks
 
 - Preliminary after LLM review, without independent human labels or an outside rerun.
 - One document collection and one runtime; fixed attacks rather than a comprehensive adaptive evaluation. No general safety claim follows from a zero count.
 - Counts concern the measured version. A later link-filter patch is not validated by these original results and requires a separately labelled check.
-- A repeat comparison on one selected attack type matched 293/312 automatic outcomes (93.9%). This is not a random 10% sample across all attack types, nor proof of bit-identical reproduction.
+- The A2-only repeat matched 293/312 automatic outcomes (93.9%), including 48/48 with all four defenses. It checks label agreement for A2, not identical text, independent human scoring or forged-figure repeatability.
 - Unapproved documents are rejected by the provenance check by design; zero successes in that condition are not evidence that the underlying model is immune.
 - The supplied table script recomputes tables from the CSV. It does not rerun model tests, independently validate labels or reproduce the original experiment.
 
@@ -60,6 +108,8 @@ The measured defense modules can be supplied privately to grant reviewers on req
 
 ## Files and license
 
-`RESULTS-PRELIMINARY.csv` contains 24 model-condition rows and 12 pooled attack-group rows. `make-evidence-table.py` checks their arithmetic and prints the two tables. `EVIDENCE-SHA256.txt` records the bytes in this evidence package; these are post-run publication fingerprints, not preregistration.
+`RESULTS-PRELIMINARY.csv` contains 24 model-condition rows and 12 pooled attack-group rows. `make-evidence-table.py` checks their arithmetic and prints the two main tables. The supporting tables in this note were checked separately against the recorded aggregates and repeat files; they are not included in that 36-row CSV or recomputed by the supplied script. `EVIDENCE-SHA256.txt` records the bytes in this evidence package; these are post-run publication fingerprints, not preregistration.
 
 Tables and this note: CC BY 4.0. Table-generation script: MIT. Published 4 October 2026. These hashes are post-run publication fingerprints, not preregistration.
+
+Update, 4 October 2026: added the post-hoc grouping, usefulness and adapted-BIPIA counts, A2 repeat details, and the 13/24 CSV answer outcome separately from 24/24 retrieval. No new experiment was run and the original 36 CSV rows are unchanged.
