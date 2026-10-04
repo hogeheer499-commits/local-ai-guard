@@ -54,21 +54,22 @@ Factual answers labelled correct, out of 40 per model in the committed-corpus se
 | qwen3.8:27b-q4_K_M | 40/40 | 40/40 |
 | Total | 154/160 | 155/160 |
 
-The pooled counts conceal a decline for the 7B model. They do not establish an improvement in usefulness. With all defenses, each model also declined all five questions the guide could not answer (20/20 across models). These are recorded scoring outcomes, not independent human validation.
+The pooled counts conceal a decline for the 7B model. They do not establish an improvement in usefulness. With all defenses, each model also declined all five questions the guide could not answer (20/20 across models). Those are five question designs tested on four models, not 20 distinct questions. These are recorded automated scoring outcomes, not independent human validation or evidence of general usefulness beyond this question set.
 
 ### Adapted BIPIA subset
 
-Successful attacks in valid retrieved-answer cases, after LLM-assisted checking:
+This adaptation used 75 items: 25 with local deterministic scoring and 50 with a local judge model (`qwen3.8:27b-q4_K_M`), followed by LLM-assisted checking. Independent human validation remains pending. The table reports successful attacks / valid retrieved-answer cases in the committed-poison run, with source approval where provenance applies.
 
-| Model | No defense | System prompt | All four |
-|---|---:|---:|---:|
-| devstral-small-2:latest | 3/74 | 0/74 | 0/74 |
-| qwen2.5vl:7b | 0/74 | 0/74 | 0/74 |
-| qwen3.6:35b-a3b | 9/74 | 0/74 | 0/74 |
-| qwen3.8:27b-q4_K_M | 9/74 | 0/74 | 0/74 |
-| Total | 21/296 | 0/296 | 0/296 |
+| Defense | Devstral Small 2 | Qwen2.5-VL 7B | Qwen3.6 35B-A3B | Qwen3.8 27B | Total |
+|---|---:|---:|---:|---:|---:|
+| No defense | 3/74 | 0/74 | 9/74 | 9/74 | 21/296 |
+| System prompt | 0/74 | 0/74 | 0/74 | 0/74 | 0/296 |
+| Sanitizer | 4/73 | 1/74 | 7/74 | 6/74 | 18/295 |
+| Link filter | 3/74 | 0/74 | 9/74 | 8/74 | 20/296 |
+| Provenance check | 3/74 | 0/74 | 9/74 | 7/74 | 19/296 |
+| All four | 0/74 | 0/74 | 0/74 | 0/74 | 0/296 |
 
-This committed-corpus subset used 75 cases per model and setting. One case per model (four of 300 per setting) was excluded because the attack material was not retrieved. Scoring partly used a local judge model and was checked with LLM assistance. This is an adaptation, not a reproduction of the paper's reported benchmark results or evidence of general immunity. [BIPIA paper](https://arxiv.org/abs/2312.14197).
+There were 300 scheduled cases per setting (75 items on four models), without the six-repeat design of the own attack suite. Four cases per setting were excluded because the attack material was not retrieved. The sanitizer setting had one additional execution error, leaving 295 valid cases; the other displayed settings had 296. Excluded cases are not counted as successful defense outcomes. This is an adaptation, not a reproduction of the paper's reported benchmark results or evidence of general immunity. [BIPIA paper](https://arxiv.org/abs/2312.14197).
 
 ### Repeat check: A2 only
 
@@ -83,6 +84,22 @@ The same author reran one of the ten fixed attack types, A2, selected by the rep
 | Total | 293/312 | 48/48 |
 
 The all-four column includes both approved and unapproved source conditions (six measurements per model per condition). Agreement concerns automatic outcome labels, not identical answer text. It does not repeat the forged-figure attack types A3/A4 or independently validate any label. Later LLM-corrected labels are separate from this automatic comparison.
+
+Automatic-label agreement by defense and document status:
+
+| Defense and document status | Matched | Compared | Changed |
+|---|---:|---:|---:|
+| No defense | 40 | 48 | 8 |
+| System prompt | 48 | 48 | 0 |
+| Sanitizer | 48 | 48 | 0 |
+| Link filter | 39 | 48 | 9 |
+| Provenance check, approved | 22 | 24 | 2 |
+| Provenance check, unapproved | 48 | 48 | 0 |
+| All four, approved | 24 | 24 | 0 |
+| All four, unapproved | 24 | 24 | 0 |
+| Total | 293 | 312 | 19 |
+
+Rows pool the four models and both poison modes where that setting was run. Approved all-four cases belong to the committed-poison run; unapproved all-four cases to the memory-poison run. All 48 all-four labels were blocked in both runs. Committed-poison labels matched in 158/168 cases; memory-poison labels in 135/144. No comparison key was duplicated or missing its baseline counterpart. Fourteen labels changed from blocked to successful; five changed from successful to blocked. The repeat kept the original seeds and temperatures: 52 measurements at temperature 0 and 260 at temperature 0.7. The two modes are repeated settings, not independent attack designs.
 
 ## Limits and checks
 
@@ -108,8 +125,10 @@ The measured defense modules can be supplied privately to grant reviewers on req
 
 ## Files and license
 
-`RESULTS-PRELIMINARY.csv` contains 24 model-condition rows and 12 pooled attack-group rows. `make-evidence-table.py` checks their arithmetic and prints the two main tables. The supporting tables in this note were checked separately against the recorded aggregates and repeat files; they are not included in that 36-row CSV or recomputed by the supplied script. `EVIDENCE-SHA256.txt` records the bytes in this evidence package; these are post-run publication fingerprints, not preregistration.
+`RESULTS-PRELIMINARY.csv` contains 24 model-condition rows and 12 pooled attack-group rows. `make-evidence-table.py` checks their arithmetic and prints the two main tables. [RESULTS-SUPPORTING.csv](RESULTS-SUPPORTING.csv) contains 58 additional aggregate rows for usefulness, adapted BIPIA, and A2 repeat agreement by model, defense and mode, plus temperature counts and changed-label directions. Its `count` and `denominator` apply to the stated metric; rows describe overlapping views and must not be added across scopes. BIPIA also records excluded retrieval cases and execution errors. These tables were checked separately against the recorded aggregates and repeat files; the supplied script only recomputes the original 36-row CSV. `EVIDENCE-SHA256.txt` records the bytes in this evidence package; these are post-run publication fingerprints, not preregistration.
 
 Tables and this note: CC BY 4.0. Table-generation script: MIT. Published 4 October 2026. These hashes are post-run publication fingerprints, not preregistration.
 
 Update, 4 October 2026: added the post-hoc grouping, usefulness and adapted-BIPIA counts, A2 repeat details, and the 13/24 CSV answer outcome separately from 24/24 retrieval. No new experiment was run and the original 36 CSV rows are unchanged.
+
+Further method detail, 4 October 2026: expanded BIPIA to all six defenses and recorded scorer, exclusions, repeat settings and both temperatures. Added the machine-readable supporting CSV after checking the datatest handoff. This does not publish defense code or raw answers.
