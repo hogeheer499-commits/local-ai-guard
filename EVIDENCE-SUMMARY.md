@@ -4,7 +4,7 @@ Results from evaluation v5, documented 3 October and published 4 October 2026. C
 
 ## Main finding
 
-The combined defenses stopped the fixed instruction-related attacks in these tests, but did not stop forged figures. The sanitizer could make a forged CSV row easier to retrieve: the row was retrieved in 24/24 tested cases with sanitization and 0/24 without it. With all four defenses, 13/24 answers were provisionally labelled as presenting that forged figure as correct. Retrieving the row in 24/24 cases is a separate outcome; it does not mean 24/24 answers accepted the forgery. This trace concerns one CSV case and does not explain every forged-figure result.
+Prompt injection through documents worked against all four local models without safeguards: 56/192 instruction-related attacks succeeded with approved poison. With all four safeguards combined, 0/192 succeeded in these tests. Testing each safeguard separately also exposed a side effect: the sanitizer removed a suspicious note from a forged CSV row but kept the false number, and that row became easier to retrieve (24/24 tested cases with sanitization, 0/24 without). Forged-figure attacks rose from 13/48 to 24/48 with all four safeguards; in the CSV case, 13/24 answers were provisionally labelled as presenting the forged figure as correct. Retrieving the row is a separate outcome from accepting the forgery. This trace concerns one CSV case and does not explain every forged-figure result.
 
 ## Setting
 
@@ -132,3 +132,5 @@ Tables and this note: CC BY 4.0. Table-generation script: MIT. Published 4 Octob
 Update, 4 October 2026: added the post-hoc grouping, usefulness and adapted-BIPIA counts, A2 repeat details, and the 13/24 CSV answer outcome separately from 24/24 retrieval. No new experiment was run and the original 36 CSV rows are unchanged.
 
 Further method detail, 4 October 2026: expanded BIPIA to all six defenses and recorded scorer, exclusions, repeat settings and both temperatures. Added the machine-readable supporting CSV after checking the datatest handoff. This does not publish defense code or raw answers.
+
+Update, 8 October 2026: reordered the main finding to lead with the document-injection comparison before the sanitizer side effect. No counts changed.
